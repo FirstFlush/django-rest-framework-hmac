@@ -82,11 +82,14 @@ class HMACSigner(BaseHMAC):
 
 
     def add_hmac_headers(self):
-        """Sign outgoing requests to Crypto API with HMAC key."""
+        """Sign outgoing requests and add the signature/key to the HMAC headers.
+        
+        Important: The key is not used to create the signature. The key is merely 
+        used as a reference to look up the "secret" value, which is used to sign requests.
+        """
         signature = self._calc_signature()
         hmac_headers = {
             'KEY': self.key,
             'SIGNATURE': signature,
         }
-
         return hmac_headers
