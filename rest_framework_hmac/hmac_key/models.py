@@ -51,8 +51,12 @@ class HMACKey(models.Model):
 
 
     def save(self, *args, **kwargs):
-        if self.secret is None:
+        """If key and secret are left blank then a cryptographically secure 
+        pseudorandom string of 40 chars will be generated for the secret. The 
+        key will then be the SHA1 hash of the secret (also 40 chars).
+        """
+        if self.secret == '':
             self.secret = self.generate_secret()
-        if self.key is None:
+        if self.key == '':
             self.key = self.generate_key(self.secret)
         super(HMACKey, self).save(*args, **kwargs)

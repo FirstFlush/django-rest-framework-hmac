@@ -13,17 +13,16 @@ class HMACAuthentication(BaseAuthentication):
     def authenticate(self, request):
 
         signature = self.get_signature(request)
-        user = self.get_key(request)
-        b64 = HMACAuthenticator(user).calc_signature(request)
-
+        hmac_obj = self.get_hmac_object(request)
+        b64 = HMACAuthenticator(hmac_obj).calc_signature(request)
         if not hmac.compare_digest(b64, signature):
             raise AuthenticationFailed()
-
-        return (user, None)
+                
+        return (hmac_obj.user, None)
 
 
     @staticmethod
-    def get_key(request):
+    def get_hmac_object(request):
         hmac_key = request.META['HTTP_KEY']
         try:
             return HMACKey.objects.get(key=hmac_key)

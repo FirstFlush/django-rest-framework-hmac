@@ -39,15 +39,16 @@ class HMACAuthenticator(BaseHMAC):
         signature = self._calc_signature_from_str(string_to_sign)
         return signature
 
+
     def string_to_sign(self, request):
         """
         Calcuates the string to sign using the HMAC secret
         """
-        s = ''
+        string_to_sign = ''
         # Don't add in case of a 'GET' request
         if getattr(request, 'data', None):
-            s += json.dumps(request.data, separators=(',', ':'))
-        return s
+            string_to_sign += json.dumps(request.data, separators=(',', ':'))
+        return string_to_sign
 
 
 
@@ -73,15 +74,14 @@ class HMACSigner(BaseHMAC):
 
     def _string_to_sign(self):
         """Calcuates the string to sign using the HMAC secret"""
-        s = ''
-        # Don't add in case of a 'GET' request
+        string_to_sign = ''
         if self.data:
-            s += json.dumps(self.data, separators=(',', ':'))
+            string_to_sign += json.dumps(self.data, separators=(',', ':'))
 
-        return s
+        return string_to_sign
 
 
-    def add_hmac_headers(self):
+    def add_hmac_headers(self, headers:dict):
         """Sign outgoing requests and add the signature/key to the HMAC headers.
         
         Important: The key is not used to create the signature. The key is merely 
@@ -92,4 +92,6 @@ class HMACSigner(BaseHMAC):
             'KEY': self.key,
             'SIGNATURE': signature,
         }
-        return hmac_headers
+        new_headers = headers | hmac_headers
+
+        return new_headers
